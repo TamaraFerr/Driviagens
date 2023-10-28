@@ -1,11 +1,13 @@
-export default function validateSchema(schema) {
-    return (req, res, next) => {
-        const validation = schema.validate(req.body, { abortEarly: false })
+import { errors } from "../errors/errors.js"
 
-        if (validation.error) {
-            const errors = validation.error.details.map(detail => detail.message)
-            return res.status(422).send(errors)
+export function validateSchema(schema) {
+    return (req, res, next) => {
+        const validate = schema.validate(req.body);
+
+        if (validate.error) {
+            console.log(validate.error.details)
+            throw errors.wrongData()
         }
-        next()
+        next();
     }
 }
