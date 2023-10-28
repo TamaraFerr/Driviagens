@@ -1,9 +1,11 @@
-import Joi from "joi";
+import joiBase from "joi"
+import joiDate from "@joi/date"
 
-const flightSchema = Joi.object({
-    origin: Joi.number().required(),
-    destination: Joi.number().required(),
-    date: Joi.date().format("DD-MM-YYYY").required()
+
+const joi = joiBase.extend(joiDate)
+
+export const flightSchema = joi.object({
+    origin: joi.number().integer().min(1).required(),
+	destination: joi.number().integer().min(1).required(),
+	date: joi.date().format("DD-MM-YYYY").required()
 })
-
-export default flightSchema;

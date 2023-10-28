@@ -1,39 +1,50 @@
+import dayjs from "dayjs";
 import db from "../database/database.connection.js";
 
-async function flightExistsByOriginAndDestination(origin, destination) {
-    const result = await db.query('SELECT 1 FROM flights WHERE origin = $1 AND destination = $2', [origin, destination]);
-    return result.rowCount > 0;
+async function create(origin, destination, date) {
+    await db.query(
+        `INSERT INTO flights (origin, destination, date) VALUES ($1, $2, $3);`,
+        [origin, destination, date]
+    )
 }
 
- async function addFlight(origin, destination, date) {
-    const query = 'INSERT INTO flights (origin, destination, date) VALUES ($1, $2, $3) RETURNING *';
-    const values = [origin, destination, date];
-    const result = await db.query(query, values);
-    return result.rows[0];
+async function findById(id) {
+    const flight = await db.query(`SELECT * FROM flights WHERE id=$1;`, [id])
+    return flight.rows[0]
 }
 
+async function findAll(origin, destination, smallerDate, biggerDate) {
+    const array = []
+    let query = `
+        SELECT f.id, c1.name AS origin, c2.name AS destination, f.date
+	        FROM flights f
+	        JOIN cities c1 ON f.origin = c1.id
+	        JOIN cities c2 ON f.destination = c2.id
+	        WHERE 1=1
+    `
 
-function getFlights(origin, destination, smallerDate, biggerDate) {
-    const query = `
-        SELECT f.id, c1.name AS origin, c2.name AS destination, TO_CHAR(f.date, 'DD-MM-YYYY') AS date
-        FROM flights AS f
-        JOIN cities AS c1 ON f.origin = c1.id
-        JOIN cities AS c2 ON f.destination = c2.id
-        WHERE ($1::text IS NULL OR c1.name = $1)
-        AND ($2::text IS NULL OR c2.name = $2)
-        AND ($3::date IS NULL OR f.date >= $3)
-        AND ($4::date IS NULL OR f.date <= $4)
-        ORDER BY f.date;
-    `;
+    if (origin) {
+        array.push(origin)
+        query += `AND c1.name=$${array.length} `
+    }
 
-    console.log('Executing getFlightsDB with params:', origin, destination, smallerDate, biggerDate);
+    if (destination) {
+        array.push(destination)
+        query += `AND c2.name=$${array.length} `
+    }
 
-    return db.query(query, [origin || null, destination || null, smallerDate || null, biggerDate || null]);
+    if (dayjs(smallerDate).isValid() && dayjs(biggerDate).isValid()) {
+        array.push(smallerDate)
+        query += `AND f.date >= $${array.length} `
+
+        array.push(biggerDate)
+        query += `AND f.date <= $${array.length} `
+    }
+
+    query += "ORDER BY f.date;"
+
+    const result = await db.query(query, array)
+    return result.rows
 }
 
-async function flightExistsById(flightId) {
-    const result = await db.query(`SELECT 1 FROM flights WHERE id = $1`, [flightId]);
-    return result.rowCount > 0;
-}
-
-export const flightRepository = {flightExistsById, flightExistsByOriginAndDestination, getFlights, addFlight}
+export const flightRepository = { create, findById, findAll }
