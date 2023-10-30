@@ -1,6 +1,6 @@
 import { errors } from "../errors/errors.js"
-import { cityRepository } from "../repositories/cityRepository.js"
-import { flightRepository } from "../repositories/flightRepository.js"
+import { cityRepository } from "../repositories/citie.repository.js"
+import { flightRepository } from "../repositories/flight.repository.js"
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat.js"
 dayjs.extend(customParseFormat)

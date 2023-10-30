@@ -1,5 +1,5 @@
 import { errors } from "../errors/errors.js"
-import { passengerRepository } from "../repositories/passengerRepository.js"
+import { passengerRepository } from "../repositories/passenger.repository.js"
 
 async function create(firstName, lastName) {
     await passengerRepository.create(firstName, lastName)

@@ -1,14 +1,14 @@
 import httpStatus from "http-status"
 import { passengerService } from "../services/passengerService.js"
 
-async function create(req, res) {
+async function createPassenger(req, res) {
     const { firstName, lastName } = req.body
 
     await passengerService.create(firstName, lastName)
     res.sendStatus(httpStatus.CREATED)
 }
 
-async function findTravels(req, res) {
+async function findingTravels(req, res) {
     const { name } = req.query
 
     const travels = await passengerService.findTravels(name)
@@ -20,4 +20,4 @@ async function findTravels(req, res) {
     res.send(formattedTravels)
 }
 
-export const passengerController = { create, findTravels }
+export const passengerController = { createPassenger, findingTravels }

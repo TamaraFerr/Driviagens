@@ -1,7 +1,7 @@
 import { errors } from "../errors/errors.js"
-import { flightRepository } from "../repositories/flightRepository.js"
-import { passengerRepository } from "../repositories/passengerRepository.js"
-import { travelRepository } from "../repositories/travelRepository.js"
+import { flightRepository } from "../repositories/flight.repository.js"
+import { passengerRepository } from "../repositories/passenger.repository.js"
+import { travelRepository } from "../repositories/travels.repository.js"
 
 async function create(passengerId, flightId) {
     const passenger = await passengerRepository.findById(passengerId)
